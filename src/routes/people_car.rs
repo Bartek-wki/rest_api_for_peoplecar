@@ -6,15 +6,27 @@ pub fn calculate_dissel_usage_for_distance(
     year_of_production: u16,
     fuel_usage_per_100_km: u8,
 ) -> String {
-    assert!(year_of_production >= 2000 && year_of_production <= 2022);
-    let fuel_usage: String =
+    let fuel_usage =
         services::people_car::calculate_dissel_usage_for_distance(distance, fuel_usage_per_100_km);
-    fuel_usage
+    return format!("{}", fuel_usage);
 }
 
 #[get("/probabilityOfUnitInjectorFail?<VIN>")]
 pub fn probability_of_unit_injector_fail(VIN: &str) -> String {
-    assert!(vin::check_validity(VIN).is_ok());
-    let probability: String = services::people_car::probability_of_unit_injector_fail();
-    probability
+    let probability = services::people_car::probability_of_unit_injector_fail();
+
+    fn check_vin(my_vin: &str) -> Result<&str, &str> {
+        let error = "Wrong VIN";
+
+        if vin::check_validity(my_vin).is_ok() {
+            Ok(my_vin)
+        } else {
+            Err(error)
+        }
+    }
+
+    match check_vin(VIN) {
+        Ok(_v) => format!("{}", probability),
+        Err(_e) => format!("You have probably entered an incorrect VIN number: {}", VIN),
+    }
 }
